@@ -1,0 +1,74 @@
+# Policy 1: Control INBOUND traffic to MCP pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jira-mcp-ingress-policy
+  namespace: mcp-apps
+spec:
+  podSelector:
+    matchLabels:
+      app: jira-mcp-server        # applies to MCP pods only
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx   # only nginx can talk to pods
+      ports:
+        - protocol: TCP
+          port: 8000
+    # In k8s/phase2/networkpolicy.yaml add:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8000
+    # Allow streamlit pod (pod-to-pod)
+    - from:
+        - podSelector:
+            matchLabels:
+              app: jira-streamlit-client
+      ports:
+        - protocol: TCP
+          port: 8000
+---
+# Policy 2: Control OUTBOUND traffic from MCP pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jira-mcp-egress-policy
+  namespace: mcp-apps
+spec:
+  podSelector:
+    matchLabels:
+      app: jira-mcp-server
+  policyTypes:
+    - Egress
+  egress:
+    # Allow DNS queries to CoreDNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow DNS resolution (always needed)
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow HTTPS outbound to Jira API
+    - ports:
+        - protocol: TCP
+          port: 443
+    # Allow HTTP outbound (port 80)
+    - ports:
+        - protocol: TCP
+          port: 80

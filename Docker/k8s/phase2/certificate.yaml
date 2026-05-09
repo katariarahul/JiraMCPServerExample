@@ -1,0 +1,16 @@
+
+---
+# Certificate — tells cert-manager to generate cert for jira-mcp.local
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: jira-mcp-cert
+  namespace: mcp-apps
+spec:
+  secretName: jira-mcp-tls          # cert stored in this secret
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  commonName: jira-mcp.local
+  dnsNames:
+    - jira-mcp.local

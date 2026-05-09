@@ -1,0 +1,26 @@
+Option A: The uv Way (Recommended)
+Open your terminal in your project folder and run:
+
+Bash
+uv init
+This creates a basic pyproject.toml and a hello.py. Now, instead of manually typing dependencies into the file, use uv to add them. This ensures the versions are compatible:
+
+Bash
+uv add "langchain>=1.0.0" "langchain-core>=1.2.16" "langchain-mcp" "mcp" "fastapi" "requests" "python-dotenv"
+uv will automatically create the file, resolve the dependencies, and build your virtual environment in one go.
+
+Run the python file
+Command - uv run python Jira_mcp_server.py
+
+Add Packages
+uv "packagename"
+
+INFO - uv uses the [project] table as the source of truth. Without it, uv thinks you are just playing around with a loose script rather than building a "Project."
+
+Command - uv run mcp install Jira_mcp_server.py --app-path "C:\Program Files\WindowsApps\Claude_1.1.4498.0_x64__pzs8sxrjxfjjc\app\claude.exe"
+C:\Program Files\WindowsApps\Claude_1.1.4498.0_x64__pzs8sxrjxfjjc\app
+
+Path for claude_desktop_config
+C:\Users\RAHUL\AppData\Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude
+
+uv run python .\Jira_mcp_server_http.py

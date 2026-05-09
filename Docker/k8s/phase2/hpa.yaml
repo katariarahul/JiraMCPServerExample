@@ -1,0 +1,38 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: jira-mcp-hpa
+  namespace: mcp-apps
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: jira-mcp-server
+  minReplicas: 2                  # always keep minimum 2
+  maxReplicas: 5                  # scale up to max 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70  # scale up when CPU > 70%
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80  # scale up when memory > 80%
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 30    # wait 30s before scaling up
+      policies:
+        - type: Pods
+          value: 1                      # add 1 pod at a time
+          periodSeconds: 30
+    scaleDown:
+      stabilizationWindowSeconds: 120   # wait 2mins before scaling down
+      policies:
+        - type: Pods
+          value: 1                      # remove 1 pod at a time
+          periodSeconds: 60

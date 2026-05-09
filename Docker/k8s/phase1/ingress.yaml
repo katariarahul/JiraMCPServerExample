@@ -1,0 +1,41 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jira-mcp-ingress
+  namespace: mcp-apps
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+
+    # Streaming/SSE support
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"          # disable buffering for SSE
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"      # 1hr read timeout
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"      # 1hr send timeout
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"     # connection timeout
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"       # required for streaming
+     # Sticky sessions - same client always routes to same pod
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "MCP_ROUTE"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+    # TLS additions
+    #cert-manager.io/cluster-issuer: "selfsigned-issuer"  # auto cert Not need as cert are generated manually
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"      # force HTTPS
+   
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - jira-mcp.local
+      secretName: jira-mcp-tls      # same secret as certificate
+  rules:
+    - host: jira-mcp.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jira-mcp-service
+                port:
+                  number: 8000

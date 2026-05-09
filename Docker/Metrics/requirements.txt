@@ -1,0 +1,7 @@
+mcp[cli]
+requests
+python-dotenv
+uvicorn
+fastapi
+uvicorn
+prometheus-client>=0.24.1

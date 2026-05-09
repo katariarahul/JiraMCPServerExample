@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: jira-mcp-monitor
+  namespace: monitoring        # ← must be in monitoring namespace
+  labels:
+    release: prometheus        # ← must match prometheus selector
+spec:
+  namespaceSelector:
+    matchNames:
+      - mcp-apps               # ← watch mcp-apps namespace
+  selector:
+    matchLabels:
+      app: jira-mcp-server     # ← match our MCP service
+  endpoints:
+    - port: http               # ← port name in service
+      interval: 15s            # ← scrape every 15s
+      path: /metrics           # ← metrics endpoint

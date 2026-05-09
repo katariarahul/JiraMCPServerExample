@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jira-mcp-config
+  namespace: mcp-apps
+data:
+  ALLOWED_HOSTS: "jira-mcp.local,jira-mcp.local:80,localhost,localhost:8000,127.0.0.1,127.0.0.1:8000,jira-mcp-service,jira-mcp-service.mcp-apps.svc.cluster.local,jira-mcp-internal-service,jira-mcp-internal-service.mcp-apps.svc.cluster.local,jira-mcp-internal-service.mcp-apps.svc.cluster.local:8000"

@@ -1,0 +1,15 @@
+fastapi 
+uvicorn 
+requests
+langchain[openai]==1.0
+python-dotenv
+opik
+ipykernel
+ddgs
+wikipedia
+grandalf
+pydantic
+langchain-community==0.4.1
+faiss-cpu
+langchain-core==1.2.16
+langchain-mcp

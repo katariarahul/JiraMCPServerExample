@@ -216,3 +216,32 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Custom
+# Sensitive API/Auth files
+credentials.json
+token.json
+cert/
+
+# Environments and Tooling
+.venv/
+.vscode/
+
+# Python clutter
+**/__pycache__/
+*.pyc
+
+# Personal notes and images (optional but recommended)
+Notes.txt
+*.jpg
+
+# Environment and keys
+.env
+.nonadmin
+mcpserver/
+
+# Kubernetes Secrets and Certificates
+**/*.key
+**/*.crt
+Docker/k8s/**/secret.yaml
+Docker/k8s/**/jira-mcp-tls-secret.yaml

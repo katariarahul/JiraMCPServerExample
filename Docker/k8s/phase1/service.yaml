@@ -1,0 +1,22 @@
+# k8s/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: jira-mcp-service
+  namespace: mcp-apps
+  labels:                      # ← add this
+    app: jira-mcp-server
+    monitoring: enabled
+spec:
+  selector:
+    app: jira-mcp-server
+  ports:
+    - protocol: TCP
+      port: 8000           # external port
+      targetPort: 8000   # container port
+      name: http         # ← add port name (needed by ServiceMonitor)
+  type: ClusterIP     # minikube tunnel exposes this
+  sessionAffinity: ClientIP          # same client always hits same pod
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600

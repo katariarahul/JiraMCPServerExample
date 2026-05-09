@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jira-mcp-internal-service
+  namespace: mcp-apps
+  labels:                      # ← add this
+    app: jira-mcp-server
+    monitoring: enabled
+spec:
+  clusterIP: None          # ← headless
+  selector:
+    app: jira-mcp-server
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      name: http               # ← add port name

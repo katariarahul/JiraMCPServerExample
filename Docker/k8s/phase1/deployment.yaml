@@ -1,0 +1,84 @@
+# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jira-mcp-server
+  namespace: mcp-apps
+  labels:
+    app: jira-mcp-server
+spec:
+  replicas: 2                        # 2 pods for HA
+  selector:
+    matchLabels:
+      app: jira-mcp-server
+  template:
+    metadata:
+      labels:
+        app: jira-mcp-server
+    spec:
+      serviceAccountName: jira-mcp-sa        # ← add this
+      automountServiceAccountToken: false     # ← add this
+      # SECURITY: Don't run as root
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+
+      containers:
+        - name: jira-mcp-server
+          image: my-jira-mcp-metrics:latest   # your local docker image
+          imagePullPolicy: Never      # use local image in minikube
+          ports:
+            - containerPort: 8000
+
+          # Non-sensitive config from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: jira-mcp-config
+          # SECURITY: Inject secrets as env vars (not baked into image)
+          env:
+            - name: JIRA_URL
+              valueFrom:
+                secretKeyRef:
+                  name: jira-secrets
+                  key: JIRA_URL
+            - name: JIRA_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: jira-secrets
+                  key: JIRA_EMAIL
+            - name: JIRA_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: jira-secrets
+                  key: JIRA_API_TOKEN
+
+          # SECURITY: Lock down container capabilities
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+
+          # Health checks
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          # Resource limits (prevent noisy-neighbour)
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
